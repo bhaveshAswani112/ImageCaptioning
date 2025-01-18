@@ -23,7 +23,7 @@ To get this project up and running locally on your machine, follow these steps:
 git clone https://github.com/bhaveshAswani112/ImageCaptioning.git
 ```
 ``` bash
-cd image-captioning
+cd ImageCaptioning
 ```
 - Create and activate a virtual environment:
 
