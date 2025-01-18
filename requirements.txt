@@ -1,0 +1,4 @@
+tensorflow
+dill
+PIL
+streamlit
