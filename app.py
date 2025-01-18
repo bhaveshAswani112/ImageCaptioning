@@ -11,6 +11,9 @@ import io
 
 # Load model and tokenizer
 
+
+st.set_page_config(page_title="Image Captioning Project", page_icon=":camera:", layout="centered")
+
 @st.cache_resource
 def load_model() : 
     with open('working/all_captions.pkl', 'rb') as f:
@@ -82,7 +85,7 @@ def predict_caption(model, image, tokenizer, max_length):
 
 def main():
     [model,tokenizer] = load_model()
-    st.set_page_config(page_title="Image Captioning Project", page_icon=":camera:", layout="centered")
+    
     st.markdown("""
         <style>
         .title {
