@@ -10,35 +10,41 @@ from tensorflow.keras.layers import Input, Dense, Dropout, Embedding, LSTM, Add
 import io
 
 # Load model and tokenizer
-with open('working/all_captions.pkl', 'rb') as f:
-    all_captions = dill.load(f)
 
-tokenizer = Tokenizer()
-tokenizer.fit_on_texts(all_captions)
-vocab_size = len(tokenizer.word_index) + 1
-max_len_cap = max(len(caption.split()) for caption in all_captions)
+@st.cache_resource
+def load_model() : 
+    with open('working/all_captions.pkl', 'rb') as f:
+        all_captions = dill.load(f)
 
-input1 = Input(shape=(4096,), name="image_input")
-fe1 = Dropout(0.4, name="image_dropout")(input1)
-fe2 = Dense(256, activation='relu', name="image_dense")(fe1)
+    tokenizer = Tokenizer()
+    tokenizer.fit_on_texts(all_captions)
+    vocab_size = len(tokenizer.word_index) + 1
+    max_len_cap = max(len(caption.split()) for caption in all_captions)
 
-input2 = Input(shape=(max_len_cap,), name="text_input")
-se1 = Embedding(vocab_size, 256, mask_zero=True, name="text_embedding")(input2)
-se2 = Dropout(0.4, name="text_dropout")(se1)
-se3 = LSTM(256, return_sequences=False, name="text_lstm")(se2)
+    input1 = Input(shape=(4096,), name="image_input")
+    fe1 = Dropout(0.4, name="image_dropout")(input1)
+    fe2 = Dense(256, activation='relu', name="image_dense")(fe1)
 
-decoder1 = Add()([fe2, se3])
-decoder2 = Dense(256, activation='relu', name="decoder_dense")(decoder1)
-outputs = Dense(vocab_size, activation='softmax', name="output_dense")(decoder2)
+    input2 = Input(shape=(max_len_cap,), name="text_input")
+    se1 = Embedding(vocab_size, 256, mask_zero=True, name="text_embedding")(input2)
+    se2 = Dropout(0.4, name="text_dropout")(se1)
+    se3 = LSTM(256, return_sequences=False, name="text_lstm")(se2)
 
-model = Model(inputs=[input1, input2], outputs=outputs)
-model.compile(loss='categorical_crossentropy', optimizer='adam')
-model.load_weights('working/model_weights_epoch_1.h5')
+    decoder1 = Add()([fe2, se3])
+    decoder2 = Dense(256, activation='relu', name="decoder_dense")(decoder1)
+    outputs = Dense(vocab_size, activation='softmax', name="output_dense")(decoder2)
+
+    model = Model(inputs=[input1, input2], outputs=outputs)
+    model.compile(loss='categorical_crossentropy', optimizer='adam')
+    model.load_weights('working/model_weights_epoch_1.h5')
+
+    return [model,tokenizer]
+
+max_length = 35
 
 vgg16 = VGG16(weights='imagenet')
 vgg16 = Model(inputs=vgg16.inputs, outputs=vgg16.layers[-2].output)
 
-max_length = 35
 
 def preprocess_image(image):
     img = Image.open(io.BytesIO(image))
@@ -75,8 +81,8 @@ def predict_caption(model, image, tokenizer, max_length):
     return in_text[8:-6]
 
 def main():
+    [model,tokenizer] = load_model()
     st.set_page_config(page_title="Image Captioning Project", page_icon=":camera:", layout="centered")
-
     st.markdown("""
         <style>
         .title {
