@@ -1,4 +1,4 @@
 tensorflow
 dill
-PIL
+pillow
 streamlit
