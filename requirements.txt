@@ -2,3 +2,4 @@ tensorflow
 dill
 pillow
 streamlit
+numpy

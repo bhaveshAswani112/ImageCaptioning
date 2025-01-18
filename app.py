@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 import numpy as np
-import pickle
+import dill
 from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.models import Model
@@ -11,7 +11,7 @@ import io
 
 # Load model and tokenizer
 with open('working/all_captions.pkl', 'rb') as f:
-    all_captions = pickle.load(f)
+    all_captions = dill.load(f)
 
 tokenizer = Tokenizer()
 tokenizer.fit_on_texts(all_captions)
