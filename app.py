@@ -14,7 +14,7 @@ import io
 
 st.set_page_config(page_title="Image Captioning Project", page_icon=":camera:", layout="centered")
 
-@st.cache_resource
+
 def load_model() : 
     with open('working/all_captions.pkl', 'rb') as f:
         all_captions = dill.load(f)
